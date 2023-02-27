@@ -5,19 +5,9 @@ The game is played in the console and the player is prompted with instructions.
 It is a simple game of rock, paper, scissors with the basic rules.
 """
 
-import random
 import time
 
-from constants import *
-
-
-def calculate_computer_move() -> str:
-    """
-    Returns a randomly selected move from the list of possible moves for the computer.
-
-    :return: A string representing the computer's move ("R", "P", or "S").
-    """
-    return random.choice(COMPUTER_MOVES)
+from utils import *
 
 
 def is_valid_input(player_input: str) -> bool:
@@ -46,19 +36,19 @@ class GameCLI:
         input a move, while the computer selects a random move. The function
         then calculates the winner of the round and updates the scores.
         """
-        print("Welcome to Rock Paper Scissors! Enter Q at any time to quit. \n"
-              f"The goal of the game is to be the first player to get to {SCORE_TO_REACH}.\n"
-              "To begin please enter any key: ")
+        print(f"Welcome to Rock Paper Scissors! Enter {QUIT} at any time to quit.")
+        print(f"The goal of the game is to be the first player to get to {SCORE_TO_REACH}.")
+        input("Press Enter to begin.")
 
         while True:
             print("\nComputer is thinking...")
             time.sleep(1.5)
             computer_move = calculate_computer_move()
             print("Computer has chosen a move!\n")
-            player_move = input("Please enter Rock(R), Paper(P), or Scissors(S): ").upper()
+            player_move = input(f"Please enter {ROCK}, {PAPER}, or {SCISSORS}: ").upper()
 
             while not is_valid_input(player_move):
-                player_move = input("Please enter only R, P, S, or Q: ")
+                player_move = input(f"Please enter only {ROCK}, {PAPER}, {SCORE_TO_REACH}, or {QUIT}: ")
 
             if player_move == QUIT:
                 self.print_final_scores()
@@ -67,7 +57,14 @@ class GameCLI:
             print(f"Computer chose {CHARACTER_TO_WORD[computer_move]}!")
             print(f"You chose {CHARACTER_TO_WORD[player_move]}!")
 
-            self.calculate_winner_of_round(player_move, computer_move)
+            winner = calculate_winner_of_round(player_move, computer_move)
+
+            if winner == "Player":
+                print("Player won this round!")
+                self.player_score += 1
+            elif winner == "Computer":
+                print("Computer won this round!")
+                self.computer_score += 1
 
             print("\nScore:")
             self.print_scores()
@@ -76,27 +73,6 @@ class GameCLI:
                 break
 
         self.print_final_scores()
-
-    def calculate_winner_of_round(self, player_move: str, computer_move: str):
-        """
-        This function determines the winner of the current round and updates the
-        scores accordingly.
-
-        :param player_move: A string representing the player's move.
-        :param computer_move: A string representing the computer's move.
-        """
-        winning_moves = {
-            ROCK: SCISSORS,
-            PAPER: ROCK,
-            SCISSORS: PAPER
-        }
-
-        if winning_moves.get(player_move) == computer_move:
-            print("Player won this round!")
-            self.player_score += 1
-        elif winning_moves.get(computer_move) == player_move:
-            print("Computer won this round!")
-            self.computer_score += 1
 
     def print_scores(self):
         """
