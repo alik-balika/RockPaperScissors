@@ -13,5 +13,8 @@ Constants:
 ROCK = "R"
 PAPER = "P"
 SCISSORS = "S"
+COMPUTER_MOVES = [ROCK, PAPER, SCISSORS]
+CHARACTER_TO_WORD = {"R": "Rock", "P": "Paper", "S": "Scissors"}
+SCORE_TO_REACH = 3
 
 QUIT = "Q"

@@ -1,4 +1,5 @@
-from GameEngineCLI import start_game
+from GameEngineCLI import GameCLI
 
 if __name__ == '__main__':
-    start_game()
+    gameCLI = GameCLI()
+    gameCLI.start_game()
