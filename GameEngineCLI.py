@@ -48,7 +48,7 @@ class GameCLI:
             player_move = input(f"Please enter {ROCK}, {PAPER}, or {SCISSORS}: ").upper()
 
             while not is_valid_input(player_move):
-                player_move = input(f"Please enter only {ROCK}, {PAPER}, {SCORE_TO_REACH}, or {QUIT}: ")
+                player_move = input(f"Please enter only {ROCK}, {PAPER}, {SCISSORS}, or {QUIT}: ")
 
             if player_move == QUIT:
                 self.print_final_scores()
