@@ -1,4 +1,10 @@
 import pygame
+from constants import *
+
+
+def start_button_hovered(mouse):
+    return SCREEN_WIDTH / 2 - 100 <= mouse[0] <= SCREEN_WIDTH / 2 + 100 \
+           and SCREEN_HEIGHT / 2 + 190 <= mouse[1] <= SCREEN_HEIGHT / 2 + 250
 
 
 class GameGUI:
@@ -10,11 +16,22 @@ class GameGUI:
         self.player_score = 0
         self.computer_score = 0
 
-    def start_game(self):
+        # pygame attributes
         pygame.init()
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-        screen = pygame.display.set_mode((800, 600))
+        # images
+        self.background = pygame.image.load("img/background.png")
+        self.title_logo = pygame.image.load("img/rps_logo-removebg.png")
 
+        # fonts
+        pygame.font.init()
+        self.title_font = pygame.font.SysFont(GAME_FONT, TITLE_FONT_SIZE, bold=True)
+        self.title_text = self.title_font.render('Rock, Paper, Scissors!', False, DARK_BLUE)
+        self.button_font = pygame.font.SysFont(GAME_FONT, REGULAR_FONT_SIZE)
+        self.button_text = self.button_font.render('Begin!', False, DARK_BLUE)
+
+    def start_game(self):
         clock = pygame.time.Clock()
 
         while True:
@@ -24,13 +41,45 @@ class GameGUI:
                     pygame.quit()
                     raise SystemExit
 
+                # checks if a mouse is clicked
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # if the mouse is clicked on the button, then start the game
+                    if start_button_hovered(pygame.mouse.get_pos()):
+                        print("Start button pressed. Begin the game.")
+
             # Do logical updates here.
             # ...
 
-            screen.fill("purple")  # Fill the display with a solid color
+            # draw the background image
+            self.draw_title_screen()
 
             # Render the graphics here.
             # ...
 
             pygame.display.flip()  # Refresh on-screen display
             clock.tick(60)  # wait until next frame (at 60 FPS)
+
+    def draw_title_screen(self):
+        self.screen.blit(self.background, (0, 0))
+        self.screen.blit(self.title_logo, (250, 200))
+        self.screen.blit(self.title_text, (180, 50))
+
+        # stores the (x,y) coordinates into
+        # the variable as a tuple
+        mouse = pygame.mouse.get_pos()
+
+        # if mouse is hovered on a button it
+        # changes to lighter shade
+        if start_button_hovered(mouse):
+            pygame.draw.rect(self.screen, LIGHT_ORANGE,
+                             [SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190, BUTTON_WIDTH, BUTTON_HEIGHT],
+                             border_radius=3)
+        else:
+            pygame.draw.rect(self.screen, DARK_ORANGE,
+                             [SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190, BUTTON_WIDTH, BUTTON_HEIGHT],
+                             border_radius=3)
+
+        test_x_pos = SCREEN_WIDTH / 2 - 25
+        test_y_pos = SCREEN_HEIGHT / 2 + 210
+        # superimposing the text onto our button
+        self.screen.blit(self.button_text, (test_x_pos, test_y_pos))
