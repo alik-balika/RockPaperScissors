@@ -50,6 +50,12 @@ class GameGUI:
             pygame.display.flip()  # Refresh on-screen display
             clock.tick(60)  # wait until next frame (at 60 FPS)
 
+    def handle_pygame_events(self):
+        # Process player inputs.
+        for event in pygame.event.get():
+            self.check_if_event_is_quit(event)
+            self.check_if_start_button_is_pressed(event)
+
     def check_if_event_is_quit(self, event):
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -62,27 +68,6 @@ class GameGUI:
             if start_button_hovered(pygame.mouse.get_pos()):
                 self.title = False
                 print("Start button pressed. Begin the game.")
-
-    def draw_play_screen(self):
-        pygame.display.flip()
-        self.screen.blit(self.background, (0, 0))
-
-        # draw line down the middle
-        # pygame.draw.rect(self.screen, DARK_ORANGE, [SCREEN_WIDTH / 2, 0, 10, SCREEN_HEIGHT])
-        self.draw_dashed_line_down_the_middle()
-
-    def draw_dashed_line_down_the_middle(self):
-        num_dashed_lines = 30
-        y_pos = 5
-        for i in range(num_dashed_lines):
-            pygame.draw.rect(self.screen, RED, [SCREEN_WIDTH / 2, y_pos, 5, 10])
-            y_pos += 20
-
-    def handle_pygame_events(self):
-        # Process player inputs.
-        for event in pygame.event.get():
-            self.check_if_event_is_quit(event)
-            self.check_if_start_button_is_pressed(event)
 
     def draw_screens(self):
         if self.title:
@@ -121,3 +106,18 @@ class GameGUI:
         test_y_pos = SCREEN_HEIGHT / 2 + 210
         # superimposing the text onto our button
         self.screen.blit(self.button_text, (test_x_pos, test_y_pos))
+
+    def draw_play_screen(self):
+        pygame.display.flip()
+        self.screen.blit(self.background, (0, 0))
+
+        # draw line down the middle
+        # pygame.draw.rect(self.screen, DARK_ORANGE, [SCREEN_WIDTH / 2, 0, 10, SCREEN_HEIGHT])
+        self.draw_dashed_line_down_the_middle()
+
+    def draw_dashed_line_down_the_middle(self):
+        num_dashed_lines = 30
+        y_pos = 5
+        for i in range(num_dashed_lines):
+            pygame.draw.rect(self.screen, RED, [SCREEN_WIDTH / 2, y_pos, 5, 10])
+            y_pos += 20
