@@ -7,29 +7,6 @@ def start_button_hovered(mouse):
            and SCREEN_HEIGHT / 2 + 190 <= mouse[1] <= SCREEN_HEIGHT / 2 + 250
 
 
-def check_if_event_is_quit(event):
-    if event.type == pygame.QUIT:
-        pygame.quit()
-        raise SystemExit
-
-
-def check_if_start_button_is_pressed(event):
-    # checks if a mouse is clicked
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        # if the mouse is clicked on the button, then start the game
-        if start_button_hovered(pygame.mouse.get_pos()):
-            print("Start button pressed. Begin the game.")
-
-
-def handle_pygame_events():
-    # Process player inputs.
-    for event in pygame.event.get():
-        check_if_event_is_quit(event)
-        check_if_start_button_is_pressed(event)
-
-
-
-
 class GameGUI:
     def __init__(self):
         """
@@ -38,6 +15,8 @@ class GameGUI:
         """
         self.player_score = 0
         self.computer_score = 0
+
+        self.title = True
 
         # pygame attributes
         pygame.init()
@@ -58,12 +37,12 @@ class GameGUI:
         clock = pygame.time.Clock()
 
         while True:
-            handle_pygame_events()
+            self.handle_pygame_events()
 
             # Do logical updates here.
             # ...
 
-            self.draw_title_screen()
+            self.draw_screens()
 
             # Render the graphics here.
             # ...
@@ -71,7 +50,50 @@ class GameGUI:
             pygame.display.flip()  # Refresh on-screen display
             clock.tick(60)  # wait until next frame (at 60 FPS)
 
+    def check_if_event_is_quit(self, event):
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            raise SystemExit
+
+    def check_if_start_button_is_pressed(self, event):
+        # checks if a mouse is clicked
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # if the mouse is clicked on the button, then start the game
+            if start_button_hovered(pygame.mouse.get_pos()):
+                self.title = False
+                print("Start button pressed. Begin the game.")
+
+    def draw_play_screen(self):
+        pygame.display.flip()
+        self.screen.blit(self.background, (0, 0))
+
+        # draw line down the middle
+        # pygame.draw.rect(self.screen, DARK_ORANGE, [SCREEN_WIDTH / 2, 0, 10, SCREEN_HEIGHT])
+        self.draw_dashed_line_down_the_middle()
+
+    def draw_dashed_line_down_the_middle(self):
+        num_dashed_lines = 30
+        y_pos = 5
+        for i in range(num_dashed_lines):
+            pygame.draw.rect(self.screen, RED, [SCREEN_WIDTH / 2, y_pos, 5, 10])
+            y_pos += 20
+
+    def handle_pygame_events(self):
+        # Process player inputs.
+        for event in pygame.event.get():
+            self.check_if_event_is_quit(event)
+            self.check_if_start_button_is_pressed(event)
+
+    def draw_screens(self):
+        if self.title:
+            self.draw_title_screen()
+        else:
+            self.draw_play_screen()
+
     def draw_title_screen(self):
+        if not self.title:
+            return
+
         self.screen.blit(self.background, (0, 0))
         self.screen.blit(self.title_logo, (250, 200))
         self.screen.blit(self.title_text, (180, 50))
