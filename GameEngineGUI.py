@@ -32,6 +32,9 @@ class GameGUI:
         self.title_text = self.title_font.render('Rock, Paper, Scissors!', False, DARK_BLUE)
         self.button_font = pygame.font.SysFont(GAME_FONT, REGULAR_FONT_SIZE)
         self.button_text = self.button_font.render('Begin!', False, DARK_BLUE)
+        self.player_score_text = self.title_font.render(str(self.player_score), False, DARK_BLUE)
+        self.computer_score_text = self.title_font.render(str(self.computer_score), False, DARK_BLUE)
+
 
     def start_game(self):
         clock = pygame.time.Clock()
@@ -104,7 +107,6 @@ class GameGUI:
     def draw_title_button_text(self):
         test_x_pos = SCREEN_WIDTH / 2 - 25
         test_y_pos = SCREEN_HEIGHT / 2 + 210
-        # superimposing the text onto our button
         self.screen.blit(self.button_text, (test_x_pos, test_y_pos))
 
     def draw_play_screen(self):
@@ -114,6 +116,7 @@ class GameGUI:
         # draw line down the middle
         # pygame.draw.rect(self.screen, DARK_ORANGE, [SCREEN_WIDTH / 2, 0, 10, SCREEN_HEIGHT])
         self.draw_dashed_line_down_the_middle()
+        self.draw_scores_on_screen()
 
     def draw_dashed_line_down_the_middle(self):
         num_dashed_lines = 30
@@ -121,3 +124,11 @@ class GameGUI:
         for i in range(num_dashed_lines):
             pygame.draw.rect(self.screen, RED, [SCREEN_WIDTH / 2, y_pos, 5, 10])
             y_pos += 20
+
+    def draw_scores_on_screen(self):
+        test_x_pos_player = SCREEN_WIDTH / 4
+        test_y_pos = 20
+        self.screen.blit(self.player_score_text, (test_x_pos_player, test_y_pos))
+
+        test_x_pos_computer = 3 * SCREEN_WIDTH / 4
+        self.screen.blit(self.computer_score_text, (test_x_pos_computer, test_y_pos))
