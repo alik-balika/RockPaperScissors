@@ -9,10 +9,6 @@ def start_button_hovered(mouse):
 
 class GameGUI:
     def __init__(self):
-        """
-        This function initializes a new instance of the GameGUI class with both
-        the player's and computer's scores set to zero.
-        """
         self.player_score = 0
         self.computer_score = 0
 
@@ -25,6 +21,12 @@ class GameGUI:
         # images
         self.background = pygame.image.load("img/background.png")
         self.title_logo = pygame.image.load("img/rps_logo-removebg.png")
+        self.rock_logo = pygame.image.load("img/rock.png")
+        self.paper_logo = pygame.image.load("img/paper.png")
+        self.scissors_logo = pygame.image.load("img/scissors.png")
+        self.paper_logo = pygame.transform.scale(self.paper_logo,
+                                                    (self.paper_logo.get_rect().width * 0.9,
+                                                     self.paper_logo.get_rect().height * 0.9))
 
         # fonts
         pygame.font.init()
@@ -117,6 +119,7 @@ class GameGUI:
         # pygame.draw.rect(self.screen, DARK_ORANGE, [SCREEN_WIDTH / 2, 0, 10, SCREEN_HEIGHT])
         self.draw_dashed_line_down_the_middle()
         self.draw_scores_on_screen()
+        self.draw_player_choices()
 
     def draw_dashed_line_down_the_middle(self):
         num_dashed_lines = 30
@@ -132,3 +135,8 @@ class GameGUI:
 
         test_x_pos_computer = 3 * SCREEN_WIDTH / 4
         self.screen.blit(self.computer_score_text, (test_x_pos_computer, test_y_pos))
+
+    def draw_player_choices(self):
+        self.screen.blit(self.rock_logo, (40, 70))
+        self.screen.blit(self.paper_logo, (220, 65))
+        self.screen.blit(self.scissors_logo, (140, 200))
