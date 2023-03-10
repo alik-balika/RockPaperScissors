@@ -7,6 +7,29 @@ def start_button_hovered(mouse):
            and SCREEN_HEIGHT / 2 + 190 <= mouse[1] <= SCREEN_HEIGHT / 2 + 250
 
 
+def check_if_event_is_quit(event):
+    if event.type == pygame.QUIT:
+        pygame.quit()
+        raise SystemExit
+
+
+def check_if_start_button_is_pressed(event):
+    # checks if a mouse is clicked
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        # if the mouse is clicked on the button, then start the game
+        if start_button_hovered(pygame.mouse.get_pos()):
+            print("Start button pressed. Begin the game.")
+
+
+def handle_pygame_events():
+    # Process player inputs.
+    for event in pygame.event.get():
+        check_if_event_is_quit(event)
+        check_if_start_button_is_pressed(event)
+
+
+
+
 class GameGUI:
     def __init__(self):
         """
@@ -35,22 +58,11 @@ class GameGUI:
         clock = pygame.time.Clock()
 
         while True:
-            # Process player inputs.
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    raise SystemExit
-
-                # checks if a mouse is clicked
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    # if the mouse is clicked on the button, then start the game
-                    if start_button_hovered(pygame.mouse.get_pos()):
-                        print("Start button pressed. Begin the game.")
+            handle_pygame_events()
 
             # Do logical updates here.
             # ...
 
-            # draw the background image
             self.draw_title_screen()
 
             # Render the graphics here.
@@ -71,14 +83,18 @@ class GameGUI:
         # if mouse is hovered on a button it
         # changes to lighter shade
         if start_button_hovered(mouse):
-            pygame.draw.rect(self.screen, LIGHT_ORANGE,
-                             [SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190, BUTTON_WIDTH, BUTTON_HEIGHT],
-                             border_radius=3)
+            self.draw_title_button(LIGHT_ORANGE)
         else:
-            pygame.draw.rect(self.screen, DARK_ORANGE,
-                             [SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190, BUTTON_WIDTH, BUTTON_HEIGHT],
-                             border_radius=3)
+            self.draw_title_button(DARK_ORANGE)
 
+        self.draw_title_button_text()
+
+    def draw_title_button(self, color):
+        pygame.draw.rect(self.screen, color,
+                         [SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190, BUTTON_WIDTH, BUTTON_HEIGHT],
+                         border_radius=3)
+
+    def draw_title_button_text(self):
         test_x_pos = SCREEN_WIDTH / 2 - 25
         test_y_pos = SCREEN_HEIGHT / 2 + 210
         # superimposing the text onto our button
