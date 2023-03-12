@@ -2,6 +2,7 @@ import random
 
 import pygame
 from constants import *
+from utils import calculate_winner_of_round
 
 
 def start_button_hovered(mouse):
@@ -87,6 +88,7 @@ class GameGUI:
             if self.player_picked_choice is None:
                 self.check_if_player_picked_a_choice(event)
             self.change_flip_index(event)
+            self.reset_choice_indices_and_calculate_score(event)
 
     def check_if_event_is_quit(self, event):
         if event.type == pygame.QUIT:
@@ -152,10 +154,30 @@ class GameGUI:
         self.player_picked_choice = player_choice
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         self.computer_picked_choice = random.randint(0, 2)
+        pygame.time.set_timer(pygame.USEREVENT + EVENT_FOR_WAITING_AFTER_CHOICE, 2000, loops=1)
 
     def change_flip_index(self, event):
         if event.type == pygame.USEREVENT:
             self.computer_flip_index = (self.computer_flip_index + 1) % 3
+
+    def reset_choice_indices_and_calculate_score(self, event):
+        if event.type == pygame.USEREVENT + EVENT_FOR_WAITING_AFTER_CHOICE:
+            self.calculate_scores()
+            self.computer_picked_choice = None
+            self.player_picked_choice = None
+
+    def calculate_scores(self):
+        player_choice = COMPUTER_MOVES[self.player_picked_choice]
+        computer_choice = COMPUTER_MOVES[self.computer_picked_choice]
+
+        winner = calculate_winner_of_round(player_choice, computer_choice)
+
+        if winner == "Player":
+            self.player_score += 1
+            self.player_score_text = self.title_font.render(str(self.player_score), False, DARK_BLUE)
+        elif winner == "Computer":
+            self.computer_score += 1
+            self.computer_score_text = self.title_font.render(str(self.computer_score), False, DARK_BLUE)
 
     def draw_screens(self):
         if self.title:
@@ -251,4 +273,3 @@ class GameGUI:
         if self.computer_picked_choice is None:
             return
         self.screen.blit(self.rps_images[self.computer_picked_choice], (535, 250))
-
