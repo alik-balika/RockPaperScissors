@@ -29,6 +29,7 @@ class GameGUI:
         # pygame attributes
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.time.set_timer(pygame.USEREVENT, 1500)
 
         # images
         self.background = pygame.image.load("img/background.png")
@@ -43,6 +44,10 @@ class GameGUI:
         self.paper_logo = pygame.transform.scale(pygame.image.load("img/paper.png"),
                                                  (pygame.image.load("img/paper.png").get_rect().width * 0.9,
                                                   pygame.image.load("img/paper.png").get_rect().height * 0.9))
+
+        self.rps_images = [self.rock_logo, self.paper_logo, self.scissors_logo]
+        self.computer_flip_index = 0
+
         # fonts
         pygame.font.init()
         self.title_font = pygame.font.SysFont(GAME_FONT, TITLE_FONT_SIZE, bold=True)
@@ -75,6 +80,7 @@ class GameGUI:
             self.check_if_event_is_quit(event)
             self.check_if_start_button_is_pressed(event)
             self.check_if_player_picked_a_choice(event)
+            self.change_flip_index(event)
 
     def check_if_event_is_quit(self, event):
         if event.type == pygame.QUIT:
@@ -133,6 +139,10 @@ class GameGUI:
                                                                   (self.original_scissors_logo.get_rect().width,
                                                                    self.original_scissors_logo.get_rect().height))
 
+    def change_flip_index(self, event):
+        if event.type == pygame.USEREVENT:
+            self.computer_flip_index = (self.computer_flip_index + 1) % 3
+
     def draw_screens(self):
         if self.title:
             self.draw_title_screen()
@@ -154,8 +164,10 @@ class GameGUI:
         # if mouse is hovered on a button it
         # changes to lighter shade
         if start_button_hovered(mouse):
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             self.draw_title_button(LIGHT_ORANGE)
         else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             self.draw_title_button(DARK_ORANGE)
 
         self.draw_title_button_text()
@@ -179,6 +191,7 @@ class GameGUI:
         self.draw_dashed_line_down_the_middle()
         self.draw_scores_on_screen()
         self.draw_player_choices()
+        self.flip_through_computer_images()
 
     def draw_dashed_line_down_the_middle(self):
         num_dashed_lines = 30
@@ -196,6 +209,15 @@ class GameGUI:
         self.screen.blit(self.computer_score_text, (test_x_pos_computer, test_y_pos))
 
     def draw_player_choices(self):
+        mouse = pygame.mouse.get_pos()
+        if rock_logo_hovered(mouse) or paper_logo_hovered(mouse) or scissors_logo_hovered(mouse):
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
         self.screen.blit(self.rock_logo, (40, 70))
         self.screen.blit(self.paper_logo, (220, 65))
         self.screen.blit(self.scissors_logo, (140, 200))
+
+    def flip_through_computer_images(self):
+        self.screen.blit(self.rps_images[self.computer_flip_index], (535, 250))
