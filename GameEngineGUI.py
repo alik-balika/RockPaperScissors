@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from constants import *
 
@@ -49,6 +51,7 @@ class GameGUI:
         self.computer_flip_index = ROCK_INDEX
 
         self.player_picked_choice = None
+        self.computer_picked_choice = None
 
         # fonts
         pygame.font.init()
@@ -109,8 +112,7 @@ class GameGUI:
                 self.rock_logo = pygame.transform.smoothscale(self.original_rock_logo,
                                                               (self.original_rock_logo.get_rect().width * 0.9,
                                                                self.original_rock_logo.get_rect().height * 0.9))
-                self.player_picked_choice = ROCK_INDEX
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                self.handle_player_choice(ROCK_INDEX)
 
         if not self.title and event.type == pygame.MOUSEBUTTONUP:
             if rock_logo_hovered(pygame.mouse.get_pos()):
@@ -124,8 +126,7 @@ class GameGUI:
                 self.paper_logo = pygame.transform.smoothscale(self.original_paper_logo,
                                                                (self.original_paper_logo.get_rect().width * 0.9,
                                                                 self.original_paper_logo.get_rect().height * 0.9))
-                self.player_picked_choice = PAPER_INDEX
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                self.handle_player_choice(PAPER_INDEX)
 
         if not self.title and event.type == pygame.MOUSEBUTTONUP:
             if paper_logo_hovered(pygame.mouse.get_pos()):
@@ -139,14 +140,18 @@ class GameGUI:
                 self.scissors_logo = pygame.transform.smoothscale(self.original_scissors_logo,
                                                                   (self.original_scissors_logo.get_rect().width * 0.9,
                                                                    self.original_scissors_logo.get_rect().height * 0.9))
-                self.player_picked_choice = SCISSORS_INDEX
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                self.handle_player_choice(SCISSORS_INDEX)
 
         if not self.title and event.type == pygame.MOUSEBUTTONUP:
             if scissors_logo_hovered(pygame.mouse.get_pos()):
                 self.scissors_logo = pygame.transform.smoothscale(self.original_scissors_logo,
                                                                   (self.original_scissors_logo.get_rect().width,
                                                                    self.original_scissors_logo.get_rect().height))
+
+    def handle_player_choice(self, player_choice):
+        self.player_picked_choice = player_choice
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        self.computer_picked_choice = random.randint(0, 2)
 
     def change_flip_index(self, event):
         if event.type == pygame.USEREVENT:
@@ -202,6 +207,7 @@ class GameGUI:
         self.draw_player_choices()
         self.flip_through_computer_images()
         self.draw_choice_that_player_picked()
+        self.draw_choice_that_computer_picked()
 
     def draw_dashed_line_down_the_middle(self):
         num_dashed_lines = 30
@@ -231,10 +237,18 @@ class GameGUI:
         self.screen.blit(self.paper_logo, (220, 65))
         self.screen.blit(self.scissors_logo, (140, 200))
 
+    def flip_through_computer_images(self):
+        if self.computer_picked_choice is not None:
+            return
+        self.screen.blit(self.rps_images[self.computer_flip_index], (535, 250))
+
     def draw_choice_that_player_picked(self):
         if self.player_picked_choice is None:
             return
         self.screen.blit(self.rps_images[self.player_picked_choice], (140, 250))
 
-    def flip_through_computer_images(self):
-        self.screen.blit(self.rps_images[self.computer_flip_index], (535, 250))
+    def draw_choice_that_computer_picked(self):
+        if self.computer_picked_choice is None:
+            return
+        self.screen.blit(self.rps_images[self.computer_picked_choice], (535, 250))
+
