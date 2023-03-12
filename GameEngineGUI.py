@@ -46,7 +46,9 @@ class GameGUI:
                                                   pygame.image.load("img/paper.png").get_rect().height * 0.9))
 
         self.rps_images = [self.rock_logo, self.paper_logo, self.scissors_logo]
-        self.computer_flip_index = 0
+        self.computer_flip_index = ROCK_INDEX
+
+        self.player_picked_choice = None
 
         # fonts
         pygame.font.init()
@@ -79,7 +81,8 @@ class GameGUI:
         for event in pygame.event.get():
             self.check_if_event_is_quit(event)
             self.check_if_start_button_is_pressed(event)
-            self.check_if_player_picked_a_choice(event)
+            if self.player_picked_choice is None:
+                self.check_if_player_picked_a_choice(event)
             self.change_flip_index(event)
 
     def check_if_event_is_quit(self, event):
@@ -106,6 +109,8 @@ class GameGUI:
                 self.rock_logo = pygame.transform.smoothscale(self.original_rock_logo,
                                                               (self.original_rock_logo.get_rect().width * 0.9,
                                                                self.original_rock_logo.get_rect().height * 0.9))
+                self.player_picked_choice = ROCK_INDEX
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if not self.title and event.type == pygame.MOUSEBUTTONUP:
             if rock_logo_hovered(pygame.mouse.get_pos()):
@@ -119,6 +124,8 @@ class GameGUI:
                 self.paper_logo = pygame.transform.smoothscale(self.original_paper_logo,
                                                                (self.original_paper_logo.get_rect().width * 0.9,
                                                                 self.original_paper_logo.get_rect().height * 0.9))
+                self.player_picked_choice = PAPER_INDEX
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if not self.title and event.type == pygame.MOUSEBUTTONUP:
             if paper_logo_hovered(pygame.mouse.get_pos()):
@@ -132,6 +139,8 @@ class GameGUI:
                 self.scissors_logo = pygame.transform.smoothscale(self.original_scissors_logo,
                                                                   (self.original_scissors_logo.get_rect().width * 0.9,
                                                                    self.original_scissors_logo.get_rect().height * 0.9))
+                self.player_picked_choice = SCISSORS_INDEX
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if not self.title and event.type == pygame.MOUSEBUTTONUP:
             if scissors_logo_hovered(pygame.mouse.get_pos()):
@@ -192,6 +201,7 @@ class GameGUI:
         self.draw_scores_on_screen()
         self.draw_player_choices()
         self.flip_through_computer_images()
+        self.draw_choice_that_player_picked()
 
     def draw_dashed_line_down_the_middle(self):
         num_dashed_lines = 30
@@ -209,6 +219,8 @@ class GameGUI:
         self.screen.blit(self.computer_score_text, (test_x_pos_computer, test_y_pos))
 
     def draw_player_choices(self):
+        if self.player_picked_choice is not None:
+            return
         mouse = pygame.mouse.get_pos()
         if rock_logo_hovered(mouse) or paper_logo_hovered(mouse) or scissors_logo_hovered(mouse):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -218,6 +230,11 @@ class GameGUI:
         self.screen.blit(self.rock_logo, (40, 70))
         self.screen.blit(self.paper_logo, (220, 65))
         self.screen.blit(self.scissors_logo, (140, 200))
+
+    def draw_choice_that_player_picked(self):
+        if self.player_picked_choice is None:
+            return
+        self.screen.blit(self.rps_images[self.player_picked_choice], (140, 250))
 
     def flip_through_computer_images(self):
         self.screen.blit(self.rps_images[self.computer_flip_index], (535, 250))
