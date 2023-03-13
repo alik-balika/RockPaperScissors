@@ -68,15 +68,7 @@ class GameGUI:
 
         while True:
             self.handle_pygame_events()
-
-            # Do logical updates here.
-            # ...
-
             self.draw_screens()
-
-            # Render the graphics here.
-            # ...
-
             pygame.display.flip()  # Refresh on-screen display
             clock.tick(60)  # wait until next frame (at 60 FPS)
 
@@ -89,6 +81,7 @@ class GameGUI:
                 self.check_if_player_picked_a_choice(event)
             self.change_flip_index(event)
             self.reset_choice_indices_and_calculate_score(event)
+            self.check_if_end_button_is_pressed(event)
 
     def check_if_event_is_quit(self, event):
         if event.type == pygame.QUIT:
@@ -166,6 +159,16 @@ class GameGUI:
             self.computer_picked_choice = None
             self.player_picked_choice = None
 
+    def check_if_end_button_is_pressed(self, event):
+        # checks if a mouse is clicked
+        if self.current_screen == END_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
+            # if the mouse is clicked on the button, then restart the game
+            if start_button_hovered(pygame.mouse.get_pos()):
+                self.player_score = 0
+                self.computer_score = 0
+                self.current_screen = PLAY_SCREEN
+                print("Play again button pressed. Restart the game.")
+
     def calculate_scores(self):
         player_choice = COMPUTER_MOVES[self.player_picked_choice]
         computer_choice = COMPUTER_MOVES[self.computer_picked_choice]
@@ -174,10 +177,11 @@ class GameGUI:
 
         if winner == "Player":
             self.player_score += 1
-            self.player_score_text = self.title_font.render(str(self.player_score), False, DARK_BLUE)
         elif winner == "Computer":
             self.computer_score += 1
-            self.computer_score_text = self.title_font.render(str(self.computer_score), False, DARK_BLUE)
+
+        if self.player_score == SCORE_TO_REACH or self.computer_score == SCORE_TO_REACH:
+            self.current_screen = END_SCREEN
 
     def draw_screens(self):
         if self.current_screen == TITLE_SCREEN:
@@ -227,6 +231,8 @@ class GameGUI:
             return
         pygame.display.flip()
         self.screen.blit(self.background, (0, 0))
+        self.player_score_text = self.title_font.render(str(self.player_score), False, DARK_BLUE)
+        self.computer_score_text = self.title_font.render(str(self.computer_score), False, DARK_BLUE)
 
         # draw line down the middle
         # pygame.draw.rect(self.screen, DARK_ORANGE, [SCREEN_WIDTH / 2, 0, 10, SCREEN_HEIGHT])
