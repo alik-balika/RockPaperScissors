@@ -195,6 +195,10 @@ class GameGUI:
         self.screen.blit(self.title_logo, (250, 200))
         self.screen.blit(self.title_text, (180, 50))
 
+        self.draw_button_at_bottom_of_screen()
+        self.draw_title_button_text()
+
+    def draw_button_at_bottom_of_screen(self):
         # stores the (x,y) coordinates into
         # the variable as a tuple
         mouse = pygame.mouse.get_pos()
@@ -203,16 +207,14 @@ class GameGUI:
         # changes to lighter shade
         if start_button_hovered(mouse):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-            self.draw_title_button(LIGHT_ORANGE)
+            self.draw_button(LIGHT_ORANGE, SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190)
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-            self.draw_title_button(DARK_ORANGE)
+            self.draw_button(DARK_ORANGE, SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190)
 
-        self.draw_title_button_text()
-
-    def draw_title_button(self, color):
+    def draw_button(self, color, x, y):
         pygame.draw.rect(self.screen, color,
-                         [SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190, BUTTON_WIDTH, BUTTON_HEIGHT],
+                         [x, y, BUTTON_WIDTH, BUTTON_HEIGHT],
                          border_radius=3)
 
     def draw_title_button_text(self):
@@ -279,4 +281,23 @@ class GameGUI:
         self.screen.blit(self.rps_images[self.computer_picked_choice], (535, 250))
 
     def draw_end_screen(self):
-        pass
+        self.screen.blit(self.background, (0, 0))
+
+        x_pos = 25
+        if self.player_score == SCORE_TO_REACH:
+            x_pos = 100
+            game_over_message = "Congrats! You won the game!"
+        else:
+            game_over_message = "That's too bad. Better luck next time!"
+
+        end_text = self.title_font.render(game_over_message, False, DARK_BLUE)
+        self.screen.blit(end_text, (x_pos, 250))
+
+        self.draw_button_at_bottom_of_screen()
+        self.draw_end_button_text()
+
+    def draw_end_button_text(self):
+        end_button_text = self.button_font.render("Play again?", False, DARK_BLUE)
+        test_x_pos = SCREEN_WIDTH / 2 - 40
+        test_y_pos = SCREEN_HEIGHT / 2 + 210
+        self.screen.blit(end_button_text, (test_x_pos, test_y_pos))
