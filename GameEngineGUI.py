@@ -27,7 +27,7 @@ class GameGUI:
         self.player_score = 0
         self.computer_score = 0
 
-        self.title = True
+        self.current_screen = TITLE_SCREEN
 
         # pygame attributes
         pygame.init()
@@ -97,10 +97,10 @@ class GameGUI:
 
     def check_if_start_button_is_pressed(self, event):
         # checks if a mouse is clicked
-        if self.title and event.type == pygame.MOUSEBUTTONDOWN:
+        if self.current_screen == TITLE_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
             # if the mouse is clicked on the button, then start the game
             if start_button_hovered(pygame.mouse.get_pos()):
-                self.title = False
+                self.current_screen = PLAY_SCREEN
                 print("Start button pressed. Begin the game.")
 
     def check_if_player_picked_a_choice(self, event):
@@ -109,42 +109,42 @@ class GameGUI:
         self.check_if_player_chose_scissors(event)
 
     def check_if_player_chose_rock(self, event):
-        if not self.title and event.type == pygame.MOUSEBUTTONDOWN:
+        if self.current_screen == PLAY_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
             if rock_logo_hovered(pygame.mouse.get_pos()):
                 self.rock_logo = pygame.transform.smoothscale(self.original_rock_logo,
                                                               (self.original_rock_logo.get_rect().width * 0.9,
                                                                self.original_rock_logo.get_rect().height * 0.9))
                 self.handle_player_choice(ROCK_INDEX)
 
-        if not self.title and event.type == pygame.MOUSEBUTTONUP:
+        if self.current_screen == PLAY_SCREEN and event.type == pygame.MOUSEBUTTONUP:
             if rock_logo_hovered(pygame.mouse.get_pos()):
                 self.rock_logo = pygame.transform.smoothscale(self.original_rock_logo,
                                                               (self.original_rock_logo.get_rect().width,
                                                                self.original_rock_logo.get_rect().height))
 
     def check_if_player_chose_paper(self, event):
-        if not self.title and event.type == pygame.MOUSEBUTTONDOWN:
+        if self.current_screen == PLAY_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
             if paper_logo_hovered(pygame.mouse.get_pos()):
                 self.paper_logo = pygame.transform.smoothscale(self.original_paper_logo,
                                                                (self.original_paper_logo.get_rect().width * 0.9,
                                                                 self.original_paper_logo.get_rect().height * 0.9))
                 self.handle_player_choice(PAPER_INDEX)
 
-        if not self.title and event.type == pygame.MOUSEBUTTONUP:
+        if self.current_screen == PLAY_SCREEN and event.type == pygame.MOUSEBUTTONUP:
             if paper_logo_hovered(pygame.mouse.get_pos()):
                 self.paper_logo = pygame.transform.smoothscale(self.original_paper_logo,
                                                                (self.original_paper_logo.get_rect().width,
                                                                 self.original_paper_logo.get_rect().height))
 
     def check_if_player_chose_scissors(self, event):
-        if not self.title and event.type == pygame.MOUSEBUTTONDOWN:
+        if self.current_screen == PLAY_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
             if scissors_logo_hovered(pygame.mouse.get_pos()):
                 self.scissors_logo = pygame.transform.smoothscale(self.original_scissors_logo,
                                                                   (self.original_scissors_logo.get_rect().width * 0.9,
                                                                    self.original_scissors_logo.get_rect().height * 0.9))
                 self.handle_player_choice(SCISSORS_INDEX)
 
-        if not self.title and event.type == pygame.MOUSEBUTTONUP:
+        if self.current_screen == PLAY_SCREEN and event.type == pygame.MOUSEBUTTONUP:
             if scissors_logo_hovered(pygame.mouse.get_pos()):
                 self.scissors_logo = pygame.transform.smoothscale(self.original_scissors_logo,
                                                                   (self.original_scissors_logo.get_rect().width,
@@ -180,13 +180,15 @@ class GameGUI:
             self.computer_score_text = self.title_font.render(str(self.computer_score), False, DARK_BLUE)
 
     def draw_screens(self):
-        if self.title:
+        if self.current_screen == TITLE_SCREEN:
             self.draw_title_screen()
-        else:
+        elif self.current_screen == PLAY_SCREEN:
             self.draw_play_screen()
+        elif self.current_screen == END_SCREEN:
+            self.draw_end_screen()
 
     def draw_title_screen(self):
-        if not self.title:
+        if self.current_screen != TITLE_SCREEN:
             return
 
         self.screen.blit(self.background, (0, 0))
@@ -219,6 +221,8 @@ class GameGUI:
         self.screen.blit(self.button_text, (test_x_pos, test_y_pos))
 
     def draw_play_screen(self):
+        if self.current_screen != PLAY_SCREEN:
+            return
         pygame.display.flip()
         self.screen.blit(self.background, (0, 0))
 
@@ -273,3 +277,6 @@ class GameGUI:
         if self.computer_picked_choice is None:
             return
         self.screen.blit(self.rps_images[self.computer_picked_choice], (535, 250))
+
+    def draw_end_screen(self):
+        pass
