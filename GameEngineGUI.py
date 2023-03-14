@@ -7,6 +7,7 @@ from utils import calculate_winner_of_round
 
 class GameGUI:
     def __init__(self):
+        # game attributes
         self.player_score = 0
         self.computer_score = 0
 
@@ -20,13 +21,8 @@ class GameGUI:
         # images
         self.background = pygame.image.load("img/background.png")
         self.title_logo = pygame.image.load("img/rps_logo-removebg.png")
-        self.original_rock_logo = pygame.image.load("img/rock.png")
         self.rock_logo = pygame.image.load("img/rock.png")
-        self.original_scissors_logo = pygame.image.load("img/scissors.png")
         self.scissors_logo = pygame.image.load("img/scissors.png")
-        self.original_paper_logo = pygame.transform.scale(pygame.image.load("img/paper.png"),
-                                                          (pygame.image.load("img/paper.png").get_rect().width * 0.9,
-                                                           pygame.image.load("img/paper.png").get_rect().height * 0.9))
         self.paper_logo = pygame.transform.scale(pygame.image.load("img/paper.png"),
                                                  (pygame.image.load("img/paper.png").get_rect().width * 0.9,
                                                   pygame.image.load("img/paper.png").get_rect().height * 0.9))
@@ -53,15 +49,14 @@ class GameGUI:
             self.handle_pygame_events()
             self.draw_screens()
             pygame.display.flip()  # Refresh on-screen display
-            clock.tick(60)  # wait until next frame (at 60 FPS)
+            clock.tick(60)
 
     def handle_pygame_events(self):
         # Process player inputs.
         for event in pygame.event.get():
             self.check_if_event_is_quit(event)
             self.check_if_start_button_is_pressed(event)
-            if self.player_picked_choice is None:
-                self.check_if_player_picked_a_choice(event)
+            self.check_if_player_picked_a_choice(event)
             self.change_flip_index(event)
             self.reset_choice_indices_and_calculate_score(event)
             self.check_if_end_button_is_pressed(event)
@@ -72,14 +67,13 @@ class GameGUI:
             raise SystemExit
 
     def check_if_start_button_is_pressed(self, event):
-        # checks if a mouse is clicked
         if self.current_screen == TITLE_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
-            # if the mouse is clicked on the button, then start the game
             if self.game_component_hovered(pygame.mouse.get_pos(), START_BUTTON_DIMENSIONS):
                 self.current_screen = PLAY_SCREEN
-                print("Start button pressed. Begin the game.")
 
     def check_if_player_picked_a_choice(self, event):
+        if self.player_picked_choice is not None:
+            return
         self.check_if_player_chose(ROCK_INDEX, ROCK_LOGO_DIMENSIONS, event)
         self.check_if_player_chose(PAPER_INDEX, PAPER_LOGO_DIMENSIONS, event)
         self.check_if_player_chose(SCISSORS_INDEX, SCISSORS_LOGO_DIMENSIONS, event)
@@ -87,13 +81,13 @@ class GameGUI:
     def check_if_player_chose(self, logo_index, dimensions, event):
         if self.current_screen == PLAY_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
             if self.game_component_hovered(pygame.mouse.get_pos(), dimensions):
-                self.handle_player_choice(logo_index)
+                self.assign_player_choice_and_computer_choice(logo_index)
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                pygame.time.set_timer(pygame.USEREVENT + EVENT_FOR_WAITING_AFTER_CHOICE, 2000, loops=1)
 
-    def handle_player_choice(self, player_choice):
+    def assign_player_choice_and_computer_choice(self, player_choice):
         self.player_picked_choice = player_choice
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-        self.computer_picked_choice = random.randint(0, 2)
-        pygame.time.set_timer(pygame.USEREVENT + EVENT_FOR_WAITING_AFTER_CHOICE, 2000, loops=1)
+        self.computer_picked_choice = random.randint(0, NUM_OPTIONS)
 
     def change_flip_index(self, event):
         if event.type == pygame.USEREVENT:
@@ -102,18 +96,6 @@ class GameGUI:
     def reset_choice_indices_and_calculate_score(self, event):
         if event.type == pygame.USEREVENT + EVENT_FOR_WAITING_AFTER_CHOICE:
             self.calculate_scores()
-            self.computer_picked_choice = None
-            self.player_picked_choice = None
-
-    def check_if_end_button_is_pressed(self, event):
-        # checks if a mouse is clicked
-        if self.current_screen == END_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
-            # if the mouse is clicked on the button, then restart the game
-            if self.game_component_hovered(pygame.mouse.get_pos(), START_BUTTON_DIMENSIONS):
-                self.player_score = 0
-                self.computer_score = 0
-                self.current_screen = PLAY_SCREEN
-                print("Play again button pressed. Restart the game.")
 
     def calculate_scores(self):
         player_choice = COMPUTER_MOVES[self.player_picked_choice]
@@ -129,13 +111,20 @@ class GameGUI:
         if self.player_score == SCORE_TO_REACH or self.computer_score == SCORE_TO_REACH:
             self.current_screen = END_SCREEN
 
+        self.computer_picked_choice = None
+        self.player_picked_choice = None
+
+    def check_if_end_button_is_pressed(self, event):
+        if self.current_screen == END_SCREEN and event.type == pygame.MOUSEBUTTONDOWN:
+            if self.game_component_hovered(pygame.mouse.get_pos(), START_BUTTON_DIMENSIONS):
+                self.player_score = 0
+                self.computer_score = 0
+                self.current_screen = PLAY_SCREEN
+
     def draw_screens(self):
-        if self.current_screen == TITLE_SCREEN:
-            self.draw_title_screen()
-        elif self.current_screen == PLAY_SCREEN:
-            self.draw_play_screen()
-        elif self.current_screen == END_SCREEN:
-            self.draw_end_screen()
+        self.draw_title_screen()
+        self.draw_play_screen()
+        self.draw_end_screen()
 
     def draw_title_screen(self):
         if self.current_screen != TITLE_SCREEN:
@@ -149,18 +138,14 @@ class GameGUI:
         self.draw_title_button_text()
 
     def draw_button_at_bottom_of_screen(self):
-        # stores the (x,y) coordinates into
-        # the variable as a tuple
         mouse = pygame.mouse.get_pos()
 
-        # if mouse is hovered on a button it
-        # changes to lighter shade
         if self.game_component_hovered(mouse, START_BUTTON_DIMENSIONS):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-            self.draw_button(LIGHT_ORANGE, SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190)
+            self.draw_button(LIGHT_ORANGE, START_BUTTON_DIMENSIONS[0], START_BUTTON_DIMENSIONS[2])
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-            self.draw_button(DARK_ORANGE, SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 190)
+            self.draw_button(DARK_ORANGE, START_BUTTON_DIMENSIONS[0], START_BUTTON_DIMENSIONS[2])
 
     def draw_button(self, color, x, y):
         pygame.draw.rect(self.screen, color,
@@ -180,14 +165,14 @@ class GameGUI:
         self.player_score_text = self.title_font.render(str(self.player_score), False, DARK_BLUE)
         self.computer_score_text = self.title_font.render(str(self.computer_score), False, DARK_BLUE)
 
-        # draw line down the middle
-        # pygame.draw.rect(self.screen, DARK_ORANGE, [SCREEN_WIDTH / 2, 0, 10, SCREEN_HEIGHT])
         self.draw_dashed_line_down_the_middle()
         self.draw_scores_on_screen()
         self.draw_player_choices()
         self.flip_through_computer_images()
-        self.draw_choice_that_player_picked()
-        self.draw_choice_that_computer_picked()
+
+        if self.player_picked_choice is not None and self.computer_picked_choice is not None:
+            self.draw_choice_at_position(self.player_picked_choice, 140, 250)
+            self.draw_choice_at_position(self.computer_picked_choice, 535, 250)
 
     def draw_dashed_line_down_the_middle(self):
         num_dashed_lines = 30
@@ -224,17 +209,12 @@ class GameGUI:
             return
         self.screen.blit(self.rps_images[self.computer_flip_index], (535, 250))
 
-    def draw_choice_that_player_picked(self):
-        if self.player_picked_choice is None:
-            return
-        self.screen.blit(self.rps_images[self.player_picked_choice], (140, 250))
-
-    def draw_choice_that_computer_picked(self):
-        if self.computer_picked_choice is None:
-            return
-        self.screen.blit(self.rps_images[self.computer_picked_choice], (535, 250))
+    def draw_choice_at_position(self, choice_index, x, y):
+        self.screen.blit(self.rps_images[choice_index], (x, y))
 
     def draw_end_screen(self):
+        if self.current_screen != END_SCREEN:
+            return
         self.screen.blit(self.background, (0, 0))
 
         x_pos = 25
